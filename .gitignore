@@ -1,0 +1,5 @@
+#disk images
+assets/
+
+#spell checker
+.vscode/

@@ -241,7 +241,7 @@ class StorageCLI(CLI):
         # Call the parent constructor first.
         super(StorageCLI, self).__init__(net, **kwargs)
         # Then, set the prompt attribute.
-        self.prompt = f'mininet:{self.storage_node.cwd}> '
+        self.prompt = f'{self.host.name}:{self.storage_node.cwd}> '
 
     def do_cd(self, line: str):
         """Usage: cd <directory>
@@ -296,13 +296,11 @@ class StorageCLI(CLI):
 
 # Topology: 1 virtual device connected to a switch
 class SingleVMTopo(Topo):
+    "Single VM connected directly to the controller"
     def build(self):
-        switch = self.addSwitch('s1')
         vm = self.addHost('vm2', cls=Host)
         # WSL Note: Simple bandwidth/delay to avoid WSL2 networking issues
-        self.addLink(vm, switch, bw=100, delay='5ms')  # 100 Mbps, 5ms delay
 
-# Simulation setup
 def run_simulation():
     topo = SingleVMTopo()
     # Note: A Ryu controller must be running for this simulation to work.

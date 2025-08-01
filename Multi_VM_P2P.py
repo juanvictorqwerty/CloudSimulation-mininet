@@ -126,11 +126,13 @@ class MultiVMTopo(Topo):
         vm2 = self.addHost('vm2', ip='192.168.1.2/24')
         vm3 = self.addHost('vm3', ip='192.168.1.3/24')
 
+        # Set bandwidth to 100 Mb/s and r2q to suppress HTB warnings
+        link_opts = dict(bw=100, r2q=10)
         # Add direct links between them, creating a triangle.
         # This allows any VM to communicate directly with any other VM.
-        self.addLink(vm1, vm2)
-        self.addLink(vm2, vm3)
-        self.addLink(vm3, vm1)
+        self.addLink(vm1, vm2, **link_opts)
+        self.addLink(vm2, vm3, **link_opts)
+        self.addLink(vm3, vm1, **link_opts)
 
 def transfer_file(source_vm: Host, dest_vm: Host, source_disk_path: str, dest_disk_path: str, file_size_mb: int = 10) -> float:
     """
@@ -144,6 +146,7 @@ def transfer_file(source_vm: Host, dest_vm: Host, source_disk_path: str, dest_di
 
     print(f"\n*** Starting file transfer from {source_vm.name} ({source_ip}) to {dest_vm.name} ***")
     start_time = time.time()
+    print(f"Transfer started at: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(start_time))}")
 
     try:
         # Step 1: Create a file on source_vm's disk
@@ -179,7 +182,17 @@ def transfer_file(source_vm: Host, dest_vm: Host, source_disk_path: str, dest_di
 
     end_time = time.time()
     transfer_duration = end_time - start_time
-    print(f"*** File transfer completed in {transfer_duration:.2f} seconds ***")
+
+    # Calculate throughput in Megabits per second (Mb/s)
+    # File size is in MiB, so convert to bits. Bandwidth is in Mb/s (10^6).
+    file_size_bits = file_size_mb * 1024 * 1024 * 8
+    throughput_mbps = (file_size_bits / transfer_duration) / (1000 * 1000) if transfer_duration > 0 else 0
+
+    print(f"Transfer ended at:   {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(end_time))}")
+    print(f"Total duration:      {transfer_duration:.2f} seconds")
+    print(f"Achieved throughput: {throughput_mbps:.2f} Mb/s (Link speed: 100 Mb/s)")
+    print(f"*** File transfer from {source_vm.name} to {dest_vm.name} completed. ***")
+
     return transfer_duration
 
 def run_simulation():
@@ -230,19 +243,18 @@ def run_simulation():
             print(f"*** Virtual storage device started on {vm_name} at {disk_path}")
             print("-" * 20)
 
-        # --- Demonstrate timed file transfer from vm1 to vm2 ---
-        print("\n*** Demonstrating timed file transfer from vm1 to vm2 ***")
-        transfer_duration = transfer_file(
-            source_vm=hosts['vm1'],
-            dest_vm=hosts['vm2'],
-            source_disk_path='/mnt/vm1_disk',
-            dest_disk_path='/mnt/vm2_disk',
-            file_size_mb=10
-        )
-        if transfer_duration >= 0:
-            print(f"Transfer of 10MB file took {transfer_duration:.2f} seconds.")
-        else:
-            print("File transfer failed.")
+        # --- The automatic file transfer demonstration has been disabled. ---
+        # You can still perform manual transfers from the CLI.
+        # print("\n*** Demonstrating timed file transfer from vm1 to vm2 ***")
+        # transfer_duration = transfer_file(
+        #     source_vm=hosts['vm1'],
+        #     dest_vm=hosts['vm2'],
+        #     source_disk_path='/mnt/vm1_disk',
+        #     dest_disk_path='/mnt/vm2_disk',
+        #     file_size_mb=10
+        # )
+        # if transfer_duration < 0:
+        #     print("File transfer failed.")
 
         print("\n*** All virtual machines are running with persistent storage.")
         print("*** Topology: vm1 <--> vm2 <--> vm3 <--> vm1 (triangle)")

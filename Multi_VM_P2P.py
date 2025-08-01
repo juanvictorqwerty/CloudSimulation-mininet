@@ -261,6 +261,7 @@ def run_simulation():
         print("\n*** You are now in the Mininet CLI.")
         print("You can run commands on each VM, e.g., 'vm1 ifconfig' or 'pingall'")
         print("\n--- Example: Checking Disk Space ---")
+        print("The default working directory on each VM is root ('/'). You can check with 'vm1 pwd'.")
         print("Use the 'df -h' command on a VM's mount point:")
         print("   mininet> vm1 df -h /mnt/vm1_disk")
 

@@ -124,15 +124,15 @@ class MultiVMTopo(Topo):
         # Add three hosts with custom IP addresses on the same subnet
         vm1 = self.addHost('vm1', ip='192.168.1.1/24')
         vm2 = self.addHost('vm2', ip='192.168.1.2/24')
-        vm3 = self.addHost('vm3', ip='192.168.1.3/24')
+        #vm3 = self.addHost('vm3', ip='192.168.1.3/24')
 
         # Set bandwidth to 100 Mb/s and r2q to suppress HTB warnings
         link_opts = dict(bw=100, r2q=10)
         # Add direct links between them, creating a triangle.
         # This allows any VM to communicate directly with any other VM.
         self.addLink(vm1, vm2, **link_opts)
-        self.addLink(vm2, vm3, **link_opts)
-        self.addLink(vm3, vm1, **link_opts)
+        #self.addLink(vm2, vm3, **link_opts)
+        #self.addLink(vm3, vm1, **link_opts)
 
 def transfer_file(source_vm: Host, dest_vm: Host, source_disk_path: str, dest_disk_path: str, file_size_mb: int = 10) -> float:
     """
@@ -214,7 +214,7 @@ def run_simulation():
         print("*** Network started.")
 
         # Get host objects from the network
-        vm_names = ['vm1', 'vm2', 'vm3']
+        vm_names = ['vm1', 'vm2']
         for vm_name in vm_names:
             hosts[vm_name] = net.get(vm_name)
 

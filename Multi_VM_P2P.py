@@ -160,7 +160,7 @@ def transfer_file(source_vm: Host, dest_vm: Host, source_disk_path: str, dest_di
 
         # Step 3: Download the file from dest_vm
         print(f"Downloading file to {dest_vm.name} at {dest_file_path}...")
-        wget_output = dest_vm.cmd(f'wget http://{source_ip}/{file_name} -O {dest_file_path}')
+        wget_output = dest_vm.cmd(f'wget -q http://{source_ip}/{file_name} -O {dest_file_path}')
         if "saved" not in wget_output.lower():
             print(f"Error: File transfer failed. wget output: {wget_output}")
             return -1
@@ -182,6 +182,7 @@ def transfer_file(source_vm: Host, dest_vm: Host, source_disk_path: str, dest_di
 
     end_time = time.time()
     transfer_duration = end_time - start_time
+    
 
     # Calculate throughput in Megabits per second (Mb/s)
     # File size is in MiB, so convert to bits. Bandwidth is in Mb/s (10^6).
@@ -192,6 +193,9 @@ def transfer_file(source_vm: Host, dest_vm: Host, source_disk_path: str, dest_di
     print(f"Total duration:      {transfer_duration:.2f} seconds")
     print(f"Achieved throughput: {throughput_mbps:.2f} Mb/s (Link speed: 100 Mb/s)")
     print(f"*** File transfer from {source_vm.name} to {dest_vm.name} completed. ***")
+    print(f"File saved at: {dest_file_path}")
+    print("Started at :", time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(start_time)))
+    print("Ended at :", time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(end_time)))
 
     return transfer_duration
 
@@ -243,18 +247,7 @@ def run_simulation():
             print(f"*** Virtual storage device started on {vm_name} at {disk_path}")
             print("-" * 20)
 
-        # --- The automatic file transfer demonstration has been disabled. ---
-        # You can still perform manual transfers from the CLI.
-        # print("\n*** Demonstrating timed file transfer from vm1 to vm2 ***")
-        # transfer_duration = transfer_file(
-        #     source_vm=hosts['vm1'],
-        #     dest_vm=hosts['vm2'],
-        #     source_disk_path='/mnt/vm1_disk',
-        #     dest_disk_path='/mnt/vm2_disk',
-        #     file_size_mb=10
-        # )
-        # if transfer_duration < 0:
-        #     print("File transfer failed.")
+        
 
         print("\n*** All virtual machines are running with persistent storage.")
         print("*** Topology: vm1 <--> vm2 <--> vm3 <--> vm1 (triangle)")
